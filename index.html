@@ -8,53 +8,54 @@
             background-color: #222222
         }
     </style>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
 </head>
 
 <body>
     <script src="https://d3js.org/d3.v4.min.js"></script>
     <script>
 			var width = window.innerWidth ? window.innerWidth : document.documentElement.clientWidth ? document.documentElement.clientWidth : screen.width;
-    		var height = window.innerHeight ? window.innerHeight : document.documentElement.clientHeight ? document.documentElement.clientHeight : screen.height;
+    	var height = window.innerHeight ? window.innerHeight : document.documentElement.clientHeight ? document.documentElement.clientHeight : screen.height;
 
-    		console.log(width, height);
-    		width -= 14.2;
-    		height -= 14.2;
+  		console.log(width, height);
+  		width -= 14.2;
+  		height -= 14.2;
 
-            var radius = 80;
+      var radius = 80;
 
-            var color = ["#cccc66", "#4444dd", "#44dd44", "#dd4444"];
+      var color = ["#cccc66", "#4444dd", "#44dd44", "#dd4444"];
 
-            var nodes=
-			[ {"id": "Personal","group": 0
-			}, {"id": "Professional", "group": 1
-			}, {"id": "Projects", "group": 2
-			}, {"id": "Visualizations", "group": 3}];
-	
-        	var svg = d3.select("body").append("svg")
-        	    .attr("width", width)
-        	    .attr("height", height);
+      var nodes=
+            			[ {"id": "Personal","group": 0
+            			}, {"id": "Professional", "group": 1
+            			}, {"id": "Projects", "group": 2
+            			}, {"id": "Visualizations", "group": 3}];
 
-        	var simulation = d3.forceSimulation(nodes)
-        	.alphaDecay(0.01)
-        	.velocityDecay(0.12)
-    		.force("x", d3.forceX().strength(0.008))
-    		.force("y", d3.forceY().strength(0.008))
-    		.force("collide", d3.forceCollide().radius(radius + 2).iterations(2))
-    		.force("center", d3.forceCenter(width / 2, height / 2))
-    		.on("tick", ticked);
+    	var svg = d3.select("body").append("svg")
+    	    .attr("width", width)
+    	    .attr("height", height);
 
-    		function ticked() {
-      			node
-        			.attr("cx", function(d) { return d.x; })
-        			.attr("cy", function(d) { return d.y; });
-  			}
+    	var simulation = d3.forceSimulation(nodes)
+    	.alphaDecay(0.01)
+    	.velocityDecay(0.12)
+  		.force("x", d3.forceX().strength(0.008))
+  		.force("y", d3.forceY().strength(0.008))
+  		.force("collide", d3.forceCollide().radius(radius + 2).iterations(2))
+  		.force("center", d3.forceCenter(width / 2, height / 2))
+  		.on("tick", ticked);
 
-  			function dragstarted(d) {
-  				if (!d3.event.active)
-  					simulation.alpha(1).restart();
-  				d.fx = d.x;
-  				d.fy = d.y;
+  		function ticked() {
+    			node
+      			.attr("cx", function(d) { return d.x; })
+      			.attr("cy", function(d) { return d.y; });
 			}
+
+			function dragstarted(d) {
+				if (!d3.event.active)
+					simulation.alpha(1).restart();
+				d.fx = d.x;
+				d.fy = d.y;
+		  }
 
 			function dragged(d) {
 				if (!d3.event.active)
