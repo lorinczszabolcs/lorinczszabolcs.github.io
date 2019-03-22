@@ -4,39 +4,30 @@
 		<title>Lőrincz Szabolcs-Botond - Personal Website</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<style>
-			body {
-				background-color: #000;
-				margin: 0px;
-				overflow: hidden;
-				font-family:Monospace;
-				font-size:13px;
-				text-align:center;
-				font-weight: bold;
-				text-align:center;
-			}
-			a {
-				color:#0078ff;
-			}
-			#info {
-				color:#fff;
-				position: absolute;
-				top: 0px;
-				width: 100%;
-				padding: 5px;
-			}
-		</style>
+		<link rel="stylesheet" href="css/main.css">
+		<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+
 	</head>
 	<body>
-
-		<!-- <div id="info">
-			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - webgl particles waves example
-		</div> -->
 
 		<script src="js/three.js"></script>
 
 		<script src="js/WebGL.js"></script>
 		<script src="js/libs/stats.min.js"></script>
+
+		<div id="page-content" style="width:100%;align-self: center;">
+			<!-- Page Content -->
+			<!-- <div class="text-center p-4" id="hero-content" style="position: absolute; top:50%; left:50%;transform: translateX(-50%) translateY(-50%); background-color: rgba(33, 225, 12, 0.2); opacity:50%;">
+				<h1 class="text-white">Awesome webpage</h1>
+				<p class="text-white">under construction</p>
+			</div> -->
+			<div class="vignette"></div>
+			<div class="glitch"></div>
+			<div id="animation-content"></div>
+		</div>
+
+		
+		
 
 		<script type="x-shader/x-vertex" id="vertexshader">
 			attribute float scale;
@@ -59,22 +50,26 @@
 			if ( WEBGL.isWebGLAvailable() === false ) {
 				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
 			}
-			var SEPARATION = 100, AMOUNTX = 50, AMOUNTY = 50;
+			var SEPARATION = 100, AMOUNTX = 150, AMOUNTY = 150;
 			var container, stats;
 			var camera, scene, renderer;
 			var particles, count = 0;
 			var mouseX = 0, mouseY = 0;
 			var windowHalfX = window.innerWidth / 2;
 			var windowHalfY = window.innerHeight / 2;
+
+			const target = new THREE.Vector2();
+
 			init();
 			animate();
 			function init() {
-				container = document.createElement( 'div' );
+				container = document.getElementById("animation-content");
 				document.body.appendChild( container );
 				camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 1, 10000 );
 				camera.position.z = 1000;
+				camera.rotation.order = 'YXZ';
 				scene = new THREE.Scene();
-				//
+				
 				var numParticles = AMOUNTX * AMOUNTY;
 				var positions = new Float32Array( numParticles * 3 );
 				var scales = new Float32Array( numParticles );
@@ -143,15 +138,19 @@
 			}
 			//
 			function animate() {
+
 				requestAnimationFrame( animate );
-				render();
+				render( scene, camera );
 				
 				stats.update();
 			}
 			function render() {
-				camera.position.x += ( mouseX - camera.position.x );
-				camera.position.y += ( - mouseY - camera.position.y );
-				camera.lookAt( scene.position );
+				target.x = ( 1 - mouseX ) * 0.001;
+				target.y = ( 1 - mouseY ) * 0.001;
+				
+				camera.rotation.x += 0.025 * ( target.y - camera.rotation.x );
+				camera.rotation.y += 0.025 * ( target.x - camera.rotation.y );
+
 				var positions = particles.geometry.attributes.position.array;
 				var scales = particles.geometry.attributes.scale.array;
 				var i = 0, j = 0;
@@ -171,5 +170,9 @@
 				count += 0.025;
 			}
 		</script>
+
+		<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+		<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
 	</body>
 </html>
