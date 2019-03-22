@@ -59,7 +59,7 @@
 			if ( WEBGL.isWebGLAvailable() === false ) {
 				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
 			}
-			var SEPARATION = 100, AMOUNTX = 25, AMOUNTY = 25;
+			var SEPARATION = 100, AMOUNTX = 50, AMOUNTY = 50;
 			var container, stats;
 			var camera, scene, renderer;
 			var particles, count = 0;
@@ -82,8 +82,8 @@
 				for ( var ix = 0; ix < AMOUNTX; ix ++ ) {
 					for ( var iy = 0; iy < AMOUNTY; iy ++ ) {
 						positions[ i ] = ix * SEPARATION - ( ( AMOUNTX * SEPARATION ) / 2 ); // x
-						positions[ i + 1 ] = 0; // y
-						positions[ i + 2 ] = iy * SEPARATION - ( ( AMOUNTY * SEPARATION ) / 2 ); // z
+						positions[ i + 1 ] = iy * SEPARATION - ( ( AMOUNTY * SEPARATION ) / 2 ); // y
+						positions[ i + 2 ] = 0; // z
 						scales[ j ] = 1;
 						i += 3;
 						j ++;
@@ -149,15 +149,15 @@
 				stats.update();
 			}
 			function render() {
-				camera.position.x += ( mouseX - camera.position.x ) * .05;
-				camera.position.y += ( - mouseY - camera.position.y ) * .05;
+				camera.position.x += ( mouseX - camera.position.x );
+				camera.position.y += ( - mouseY - camera.position.y );
 				camera.lookAt( scene.position );
 				var positions = particles.geometry.attributes.position.array;
 				var scales = particles.geometry.attributes.scale.array;
 				var i = 0, j = 0;
 				for ( var ix = 0; ix < AMOUNTX; ix ++ ) {
 					for ( var iy = 0; iy < AMOUNTY; iy ++ ) {
-						positions[ i + 1 ] = ( Math.sin( ( ix + count ) * 0.3 ) * 50 ) +
+						positions[ i + 2 ] = ( Math.sin( ( ix + count ) * 0.3 ) * 50 ) +
 										( Math.sin( ( iy + count ) * 0.5 ) * 50 );
 						scales[ j ] = ( Math.sin( ( ix + count ) * 0.3 ) + 1 ) * 8 +
 										( Math.sin( ( iy + count ) * 0.5 ) + 1 ) * 8;
