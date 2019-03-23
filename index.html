@@ -130,7 +130,6 @@
 
 				loader = new THREE.GLTFLoader();
 				loader.load( 'models/telescope.gltf', function ( gltf ) {
-					console.log(gltf.scene);
 					modelgeom = gltf.scene;
 					modelgeom.scale.set( 15, 15, 15 );
 					scene.add(modelgeom);
@@ -270,7 +269,6 @@
 				});
 				var cloud = new THREE.Points(geom, material);
 				cloud.sortParticles = true;
-				console.log(cloud);
 				return cloud;
 			}
 		</script>
