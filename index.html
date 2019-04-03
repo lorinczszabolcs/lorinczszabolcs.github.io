@@ -1,308 +1,698 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="no-js">
 	<head>
-		<title>Lőrincz Szabolcs-Botond - Personal Website</title>
-		<meta charset="utf-8">
-		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<title>Lőrincz Szabolcs-Botond | Personal Website</title>
+		<meta name="description" content="Personal website of Lőrincz Szabolcs-Botond." />
+		<meta name="keywords" content="portfolio, personal" />
+		<meta name="author" content="Lőrincz Szabolcs-Botond" />
+		<!-- <link rel="shortcut icon" href="favicon.ico"> -->
 		<link rel="stylesheet" href="css/main.css">
 		<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
-
-	</head>
-	<body>
-
+		<script>document.documentElement.className="js";var supportsCssVars=function(){var e,t=document.createElement("style");return t.innerHTML="root: { --tmp-var: bold; }",document.head.appendChild(t),e=!!(window.CSS&&window.CSS.supports&&window.CSS.supports("font-weight","var(--tmp-var)")),t.parentNode.removeChild(t),e};supportsCssVars()||alert("Please view this demo in a modern browser that supports CSS Variables.");</script>
 		<script src="js/three.js"></script>
-		<script src="js/GLTFLoader.js"></script>
+		<!-- <script src="js/libs/lethargy.min.js"></script> -->
+		<script src="js/libs/lodash.js"></script>
 
-		<script src="js/WebGL.js"></script>
-		<script src="js/libs/stats.min.js"></script>
-
-		<div id="page-content" style="width:100%;align-self: center;">
-			<!-- Page Content -->
-			<!-- <div class="text-center p-4" id="hero-content" style="position: absolute; top:50%; left:50%;transform: translateX(-50%) translateY(-50%); background-color: rgba(33, 225, 12, 0.2); opacity:50%;">
-				<h1 class="text-white">Awesome webpage</h1>
-				<p class="text-white">under construction</p>
-			</div> -->
-			<div class="vignette"></div>
-			<div class="glitch"></div>
-			<!-- <div class="popup"><div class="text"></div></div> -->
-			<div id="animation-content"></div>
-		</div>
-
-		
-		
-
+	
+	</head>
+	<body class="demo-1">
 		<script type="x-shader/x-vertex" id="vertexshader">
-			attribute float scale;
+			// @author brunoimbrizi / http://brunoimbrizi.com
+
+			precision highp float;
+
+			attribute float pindex;
+			attribute vec3 position;
+			attribute vec3 offset;
+			attribute vec2 uv;
+			attribute float angle;
+
+			uniform mat4 modelViewMatrix;
+			uniform mat4 projectionMatrix;
+
+			uniform float uTime;
+			uniform float uRandom;
+			uniform float uDepth;
+			uniform float uSize;
+			uniform vec2 uTextureSize;
+			uniform sampler2D uTexture;
+			uniform sampler2D uTouch;
+
+			varying vec2 vPUv;
+			varying vec2 vUv;
+
+			float random(float n) {
+				return fract(sin(n) * 43758.5453123);
+			}
+
+			vec3 mod289_1_0(vec3 x) {
+				return x - floor(x * (1.0 / 289.0)) * 289.0;
+			}
+			
+			vec2 mod289_1_0(vec2 x) {
+				return x - floor(x * (1.0 / 289.0)) * 289.0;
+			}
+			
+			vec3 permute_1_1(vec3 x) {
+				return mod289_1_0(((x*34.0)+1.0)*x);
+			}
+
+			float snoise_1_2(vec2 v)
+			{
+				const vec4 C = vec4(0.211324865405187,  // (3.0-sqrt(3.0))/6.0
+									0.366025403784439,  // 0.5*(sqrt(3.0)-1.0)
+									-0.577350269189626,  // -1.0 + 2.0 * C.x
+									0.024390243902439); // 1.0 / 41.0
+				// First corner
+				vec2 i  = floor(v + dot(v, C.yy) );
+				vec2 x0 = v -   i + dot(i, C.xx);
+
+				// Other corners
+				vec2 i1;
+				//i1.x = step( x0.y, x0.x ); // x0.x > x0.y ? 1.0 : 0.0
+				//i1.y = 1.0 - i1.x;
+				i1 = (x0.x > x0.y) ? vec2(1.0, 0.0) : vec2(0.0, 1.0);
+				// x0 = x0 - 0.0 + 0.0 * C.xx ;
+				// x1 = x0 - i1 + 1.0 * C.xx ;
+				// x2 = x0 - 1.0 + 2.0 * C.xx ;
+				vec4 x12 = x0.xyxy + C.xxzz;
+				x12.xy -= i1;
+
+				// Permutations
+				i = mod289_1_0(i); // Avoid truncation effects in permutation
+				vec3 p = permute_1_1( permute_1_1( i.y + vec3(0.0, i1.y, 1.0 ))
+					+ i.x + vec3(0.0, i1.x, 1.0 ));
+
+				vec3 m = max(0.5 - vec3(dot(x0,x0), dot(x12.xy,x12.xy), dot(x12.zw,x12.zw)), 0.0);
+				m = m*m ;
+				m = m*m ;
+
+				// Gradients: 41 points uniformly over a line, mapped onto a diamond.
+				// The ring size 17*17 = 289 is close to a multiple of 41 (41*7 = 287)
+
+				vec3 x = 2.0 * fract(p * C.www) - 1.0;
+				vec3 h = abs(x) - 0.5;
+				vec3 ox = floor(x + 0.5);
+				vec3 a0 = x - ox;
+
+				// Normalise gradients implicitly by scaling m
+				// Approximation of: m *= inversesqrt( a0*a0 + h*h );
+				m *= 1.79284291400159 - 0.85373472095314 * ( a0*a0 + h*h );
+
+				// Compute final noise value at P
+				vec3 g;
+				g.x  = a0.x  * x0.x  + h.x  * x0.y;
+				g.yz = a0.yz * x12.xz + h.yz * x12.yw;
+				return 130.0 * dot(m, g);
+			}
+
 			void main() {
-				vec4 mvPosition = modelViewMatrix * vec4( position, 1.0 );
-				gl_PointSize = scale * ( 150.0 / - mvPosition.z );
-				gl_Position = projectionMatrix * mvPosition;
+				vUv = uv;
+
+				// particle uv
+				vec2 puv = offset.xy / uTextureSize;
+				vPUv = puv;
+
+				// pixel color
+				vec4 colA = texture2D(uTexture, puv);
+				float grey = colA.r * 0.21 + colA.g * 0.71 + colA.b * 0.07;
+
+				// displacement
+				vec3 displaced = offset;
+				// randomise
+				displaced.xy += vec2(random(pindex) - 0.5, random(offset.x + pindex) - 0.5) * uRandom;
+				float rndz = (random(pindex) + snoise_1_2(vec2(pindex * 0.1, uTime * 0.1)));
+				displaced.z += rndz * (random(pindex) * 2.0 * uDepth);
+				// center
+				displaced.xy -= uTextureSize * 0.5;
+
+				// touch
+				float t = texture2D(uTouch, puv).r;
+				displaced.z += t * 20.0 * rndz;
+				displaced.x += cos(angle) * t * 20.0 * rndz;
+				displaced.y += sin(angle) * t * 20.0 * rndz;
+
+				// particle size
+				float psize = (snoise_1_2(vec2(uTime, pindex) * 0.5) + 2.0);
+				psize *= max(grey, 0.2);
+				psize *= uSize;
+
+				// final position
+				vec4 mvPosition = modelViewMatrix * vec4(displaced, 1.0);
+				mvPosition.xyz += position * psize;
+				vec4 finalPosition = projectionMatrix * mvPosition;
+
+				gl_Position = finalPosition;
+			}
+		</script>
+		<script type="x-shader/x-vertex" id="fragmentshader">	
+			// @author brunoimbrizi / http://brunoimbrizi.com
+
+			precision highp float;
+
+			uniform sampler2D uTexture;
+
+			varying vec2 vPUv;
+			varying vec2 vUv;
+
+			void main() {
+				vec4 color = vec4(0.0);
+				vec2 uv = vUv;
+				vec2 puv = vPUv;
+
+				// pixel color
+				vec4 colA = texture2D(uTexture, puv);
+
+				// greyscale
+				float grey = colA.r * 0.21 + colA.g * 0.71 + colA.b * 0.07;
+				vec4 colB = vec4(grey, grey, grey, 1.0);
+
+				// circle
+				float border = 0.3;
+				float radius = 0.5;
+				float dist = radius - distance(uv, vec2(0.5));
+				float t = smoothstep(0.0, border, dist);
+
+				// final color
+				color = colB;
+				color.a = t;
+
+				gl_FragColor = color;
 			}
 		</script>
 
-		<script type="x-shader/x-fragment" id="fragmentshader">
-			uniform vec3 color;
-			void main() {
-				if ( length( gl_PointCoord - vec2( 0.5, 0.5 ) ) > 0.475 ) discard;
-				gl_FragColor = vec4(256.0/256.0,  // R
-				256.0/256.0,  // G
-				256.0/256.0,// B
-                      1.0); // A
+		<main>
+		</main>
+		<div class="container2">
+		</div>
+		<div id="swipezone">
+		</div>
+
+		<script>
+
+			function throttle(fn, wait) {
+				var time = Date.now();
+				return function() {
+					if ((time + wait - Date.now()) < 0) {
+					fn();
+					time = Date.now();
+					}
+				}
+			}
+
+			class Particles {
+				
+				constructor(webgl) {
+					this.webgl = webgl;
+					this.container = new THREE.Object3D();
+				}
+
+				init(src) {
+					const loader = new THREE.TextureLoader();
+
+					loader.load(src, (texture) => {
+						this.texture = texture;
+						this.texture.minFilter = THREE.LinearFilter;
+						this.texture.magFilter = THREE.LinearFilter;
+						this.texture.format = THREE.RGBFormat;
+
+						this.width = texture.image.width;
+						this.height = texture.image.height;
+
+						this.initPoints(true);
+						this.initHitArea();
+						// this.initTouch();
+						this.resize();
+						this.show();
+					});
+				}
+
+				initPoints(discard) {
+					this.numPoints = this.width * this.height;
+
+					let numVisible = this.numPoints;
+					let threshold = 0;
+					let originalColors;
+
+					if (discard) {
+						// discard pixels darker than threshold #22
+						numVisible = 0;
+						threshold = 34;
+
+						const img = this.texture.image;
+						const canvas = document.createElement('canvas');
+						const ctx = canvas.getContext('2d');
+
+						canvas.width = this.width;
+						canvas.height = this.height;
+						ctx.scale(1, -1);
+						ctx.drawImage(img, 0, 0, this.width, this.height * -1);
+
+						const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+						originalColors = Float32Array.from(imgData.data);
+
+						for (let i = 0; i < this.numPoints; i++) {
+							if (originalColors[i * 4 + 0] > threshold) numVisible++;
+						}
+
+						// console.log('numVisible', numVisible, this.numPoints);
+					}
+
+					const uniforms = {
+						uTime: { value: 0 },
+						uRandom: { value: 1.0 },
+						uDepth: { value: 1.0 },
+						uSize: { value: 0.0 },
+						uTextureSize: { value: new THREE.Vector2(this.width, this.height) },
+						uTexture: { value: this.texture },
+						// uTouch: { value: null },
+					};
+
+					var material;
+					
+					// ShaderLoader('../shaders/particle.vert', '../shaders/particle.frag',
+					// 	function (vertex, fragment) {
+
+					material = new THREE.RawShaderMaterial({
+						uniforms,
+						vertexShader: document.getElementById( 'vertexshader' ).textContent,
+						fragmentShader: document.getElementById( 'fragmentshader' ).textContent,
+						depthTest: false,
+						transparent: true,
+						// blending: THREE.AdditiveBlending
+					});
+
+					const geometry = new THREE.InstancedBufferGeometry();
+
+					// positions
+					const positions = new THREE.BufferAttribute(new Float32Array(4 * 3), 3);
+					positions.setXYZ(0, -0.5,  0.5,  0.0);
+					positions.setXYZ(1,  0.5,  0.5,  0.0);
+					positions.setXYZ(2, -0.5, -0.5,  0.0);
+					positions.setXYZ(3,  0.5, -0.5,  0.0);
+					geometry.addAttribute('position', positions);
+
+					// uvs
+					const uvs = new THREE.BufferAttribute(new Float32Array(4 * 2), 2);
+					uvs.setXYZ(0,  0.0,  0.0);
+					uvs.setXYZ(1,  1.0,  0.0);
+					uvs.setXYZ(2,  0.0,  1.0);
+					uvs.setXYZ(3,  1.0,  1.0);
+					geometry.addAttribute('uv', uvs);
+
+					// index
+					geometry.setIndex(new THREE.BufferAttribute(new Uint16Array([ 0, 2, 1, 2, 3, 1 ]), 1));
+
+					const indices = new Uint16Array(numVisible);
+					const offsets = new Float32Array(numVisible * 3);
+					const angles = new Float32Array(numVisible);
+
+					for (let i = 0, j = 0; i < this.numPoints; i++) {
+						if (discard && originalColors[i * 4 + 0] <= threshold) continue;
+
+						offsets[j * 3 + 0] = i % this.width;
+						offsets[j * 3 + 1] = Math.floor(i / this.width);
+
+						indices[j] = i;
+
+						angles[j] = Math.random() * Math.PI;
+
+						j++;
+					}
+
+					geometry.addAttribute('pindex', new THREE.InstancedBufferAttribute(indices, 1, false));
+					geometry.addAttribute('offset', new THREE.InstancedBufferAttribute(offsets, 3, false));
+					geometry.addAttribute('angle', new THREE.InstancedBufferAttribute(angles, 1, false));
+					
+					// while (!material) {
+
+					// }
+
+					this.object3D = new THREE.Mesh(geometry, material);
+					this.container.add(this.object3D);
+				}
+
+				// initTouch() {
+				// 	// create only once
+				// 	if (!this.touch) this.touch = new TouchTexture(this);
+				// 	this.object3D.material.uniforms.uTouch.value = this.touch.texture;
+				// }
+
+				initHitArea() {
+					const geometry = new THREE.PlaneGeometry(this.width, this.height, 1, 1);
+					const material = new THREE.MeshBasicMaterial({ color: 0xFFFFFF, wireframe: true, depthTest: false });
+					material.visible = false;
+					this.hitArea = new THREE.Mesh(geometry, material);
+					this.container.add(this.hitArea);
+				}
+
+				// addListeners() {
+				// 	this.handlerInteractiveMove = this.onInteractiveMove.bind(this);
+
+				// 	// this.webgl.interactive.addListener('interactive-move', this.handlerInteractiveMove);
+				// 	// this.webgl.interactive.objects.push(this.hitArea);
+				// 	// this.webgl.interactive.enable();
+				// }
+
+				// removeListeners() {
+				// 	this.webgl.interactive.removeListener('interactive-move', this.handlerInteractiveMove);
+					
+				// 	const index = this.webgl.interactive.objects.findIndex(obj => obj === this.hitArea);
+				// 	this.webgl.interactive.objects.splice(index, 1);
+				// 	this.webgl.interactive.disable();
+				// }
+
+				// ---------------------------------------------------------------------------------------------
+				// PUBLIC
+				// ---------------------------------------------------------------------------------------------
+
+				update(delta) {
+					if (!this.object3D) return;
+					if (this.touch) this.touch.update();
+
+					this.object3D.material.uniforms.uTime.value += delta;
+				}
+
+				show(time = 1.0) {
+					// reset
+					TweenLite.fromTo(this.object3D.material.uniforms.uSize, time, { value: 0.5 }, { value: 1.5 });
+					TweenLite.to(this.object3D.material.uniforms.uRandom, time, { value: 2.0 });
+					TweenLite.fromTo(this.object3D.material.uniforms.uDepth, time * 1.5, { value: 40.0 }, { value: 4.0 });
+
+					// this.addListeners();
+				}
+
+				hide(_destroy, time = 0.8) {
+					return new Promise((resolve, reject) => {
+						TweenLite.to(this.object3D.material.uniforms.uRandom, time, { value: 5.0, onComplete: () => {
+							if (_destroy) this.destroy();
+							resolve();
+						} });
+						TweenLite.to(this.object3D.material.uniforms.uDepth, time, { value: -20.0, ease: Quad.easeIn });
+						TweenLite.to(this.object3D.material.uniforms.uSize, time * 0.8, { value: 0.0 });
+
+						// this.removeListeners();
+					});
+				}
+
+				destroy() {
+					if (!this.object3D) return;
+
+					this.object3D.parent.remove(this.object3D);
+					this.object3D.geometry.dispose();
+					this.object3D.material.dispose();
+					this.object3D = null;
+
+					if (!this.hitArea) return;
+
+					this.hitArea.parent.remove(this.hitArea);
+					this.hitArea.geometry.dispose();
+					this.hitArea.material.dispose();
+					this.hitArea = null;
+				}
+
+				// ---------------------------------------------------------------------------------------------
+				// EVENT HANDLERS
+				// ---------------------------------------------------------------------------------------------
+
+				resize() {
+					if (!this.object3D) return;
+
+					const scale = this.webgl.fovHeight / this.height;
+					this.object3D.scale.set(scale, scale, 1);
+					this.hitArea.scale.set(scale, scale, 1);
+				}
+
+				// onInteractiveMove(e) {
+				// 	const uv = e.intersectionData.uv;
+				// 	if (this.touch) this.touch.addTouch(uv);
+				// }
+			}
+
+			class WebGLView {
+
+				constructor() {
+
+					this.samples = [
+						'../imgs/01.png',
+						'../imgs/02.png',
+						'../imgs/03.png',
+						// '../imgs/04.png',
+						// '../imgs/05.png',
+					];
+
+					this.initThree();
+					this.initParticles();
+					// this.initControls();
+
+					const rnd = ~~(Math.random() * this.samples.length);
+					this.goto(rnd);
+				}
+
+				initThree() {
+					// scene
+					this.scene = new THREE.Scene();
+
+					// camera
+					this.camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 1, 10000);
+					this.camera.position.z = 300;
+
+					// renderer
+					this.renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+
+					// clock
+					this.clock = new THREE.Clock(true);
+				}
+
+				// initControls() {
+				// 	this.interactive = new InteractiveControls(this.camera, this.renderer.domElement);
+				// }
+
+				initParticles() {
+					this.particles = new Particles(this);
+					this.scene.add(this.particles.container);
+				}
+
+				// ---------------------------------------------------------------------------------------------
+				// PUBLIC
+				// ---------------------------------------------------------------------------------------------
+
+				update() {
+					const delta = this.clock.getDelta();
+
+					if (this.particles) this.particles.update(delta);
+				}
+
+				draw() {
+					this.renderer.render(this.scene, this.camera);
+				}
+
+
+				goto(index) {
+					// init next
+					if (this.currSample == null) this.particles.init(this.samples[index]);
+					// hide curr then init next
+					else {
+						this.particles.hide(true).then(() => {
+							this.particles.init(this.samples[index]);
+						});
+					}
+
+					this.currSample = index;
+				}
+
+				next() {
+					if (this.currSample < this.samples.length - 1) this.goto(this.currSample + 1);
+					else this.goto(0);
+				}
+
+				previous() {
+					if (this.currSample > 0) this.goto(this.currSample - 1);
+					else this.goto(this.samples.length - 1);
+				}
+
+				// ---------------------------------------------------------------------------------------------
+				// EVENT HANDLERS
+				// ---------------------------------------------------------------------------------------------
+
+				resize() {
+					if (!this.renderer) return;
+					this.camera.aspect = window.innerWidth / window.innerHeight;
+					this.camera.updateProjectionMatrix();
+
+					this.fovHeight = 2 * Math.tan((this.camera.fov * Math.PI) / 180 / 2) * this.camera.position.z;
+
+					this.renderer.setSize(window.innerWidth, window.innerHeight);
+
+					// if (this.interactive) this.interactive.resize();
+					if (this.particles) this.particles.resize();
+				}
+			}
+
+			class IndexView {
+
+				constructor() {
+					// this.lethargy = new Lethargy();
+				}
+
+				init() {
+					this.initWebGL();
+					// this.initGUI();
+					this.addListeners();
+					this.animate();
+					this.resize();
+				}
+
+				initWebGL() {
+					this.webgl = new WebGLView(this);
+					document.querySelector('.container2').appendChild(this.webgl.renderer.domElement);
+				}
+
+				// initGUI() {
+				// 	this.gui = new GUIView(this);
+				// }
+
+				addListeners() {
+					this.handlerAnimate = this.animate.bind(this);
+
+					window.addEventListener('resize', this.resize.bind(this));
+					// window.addEventListener('keyup', this.keyup.bind(this));
+					
+					const el = this.webgl.renderer.domElement;
+					el.addEventListener("mousewheel", _.debounce(this.wheel.bind(this), 200));
+					el.addEventListener("wheel", _.debounce(this.wheel.bind(this), 200));
+					el.addEventListener("DOMMouseScroll", _.debounce(this.wheel.bind(this), 200));
+					el.addEventListener("MozMousePixelScroll", _.debounce(this.wheel.bind(this), 200));
+
+					// credit: http://www.javascriptkit.com/javatutors/touchevents2.shtml
+					function swipedetect(el, callback){
+					
+					var touchsurface = el,
+					swipedir,
+					startX,
+					startY,
+					distX,
+					distY,
+					threshold = 150, //required min distance traveled to be considered swipe
+					restraint = 100, // maximum distance allowed at the same time in perpendicular direction
+					allowedTime = 300, // maximum time allowed to travel that distance
+					elapsedTime,
+					startTime,
+					handleswipe = callback || function(swipedir){}
+
+					touchsurface.addEventListener('touchstart', function(e){
+						var touchobj = e.changedTouches[0]
+						swipedir = 'none'
+						dist = 0
+						startX = touchobj.pageX
+						startY = touchobj.pageY
+						startTime = new Date().getTime() // record time when finger first makes contact with surface
+						e.preventDefault()
+					}, false)
+
+					touchsurface.addEventListener('touchmove', function(e){
+						e.preventDefault() // prevent scrolling when inside DIV
+					}, false)
+
+					touchsurface.addEventListener('touchend', function(e){
+						var touchobj = e.changedTouches[0]
+						distX = touchobj.pageX - startX // get horizontal dist traveled by finger while in contact with surface
+						distY = touchobj.pageY - startY // get vertical dist traveled by finger while in contact with surface
+						elapsedTime = new Date().getTime() - startTime // get time elapsed
+						if (elapsedTime <= allowedTime){ // first condition for awipe met
+							if (Math.abs(distX) >= threshold && Math.abs(distY) <= restraint){ // 2nd condition for horizontal swipe met
+								swipedir = (distX < 0)? 0 : 0 // if dist traveled is negative, it indicates left swipe
+							}
+							else if (Math.abs(distY) >= threshold && Math.abs(distX) <= restraint){ // 2nd condition for vertical swipe met
+								swipedir = (distY < 0)? 1 : -1 // if dist traveled is negative, it indicates up swipe
+							}
+						}
+						handleswipe(swipedir)
+						e.preventDefault()
+					}, false)
+					}
+
+					//USAGE:
+
+					const el2 = document.getElementById('swipezone');
+					swipedetect(el2, function(swipedir){
+						if (swipedir > 0) {
+							this.webgl.previous();
+						}
+						else {
+							this.webgl.next();
+						}
+					});
+				}
+
+				animate() {
+					this.update();
+					this.draw();
+
+					this.raf = requestAnimationFrame(this.handlerAnimate);
+				}
+
+				// ---------------------------------------------------------------------------------------------
+				// PUBLIC
+				// ---------------------------------------------------------------------------------------------
+
+				update() {
+					// if (this.gui.stats) this.gui.stats.begin();
+					if (this.webgl) this.webgl.update();
+					// if (this.gui) this.gui.update();
+				}
+
+				draw() {
+					if (this.webgl) this.webgl.draw();
+					// if (this.gui.stats) this.gui.stats.end();
+				}
+
+				// ---------------------------------------------------------------------------------------------
+				// EVENT HANDLERS
+				// ---------------------------------------------------------------------------------------------
+
+				resize() {
+					if (this.webgl) this.webgl.resize();
+				}
+
+				// keyup(e) {
+				// 	// g
+				// 	if (e.keyCode == 71) { if (this.gui) this.gui.toggle(); }
+				// }
+
+				wheel(e) {
+					console.log(e);
+					// const check = this.lethargy.check(e);
+
+					// if (check !== false) {
+					// 	if (check === -1) {
+					// 		if (e.deltaY > 0) {
+					// 			console.log(e.deltaY);
+					// 			this.webgl.previous();
+					// 		}
+					// 	}
+					// 	else {
+					// 			this.webgl.next();
+					// 	}
+					// }
+
+					if (e.deltaY > 0) {
+						this.webgl.previous();
+					}
+					else {
+						this.webgl.next();
+					}
+				}
 			}
 		</script>
 
 		<script>
-			if ( WEBGL.isWebGLAvailable() === false ) {
-				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
-			}
-			var SEPARATION = 100, AMOUNTX = 150, AMOUNTY = 150;
-			var container, stats;
-			var camera, scene, renderer;
-			var particles, count = 0;
-			var mouseX = 0, mouseY = 0;
-			var windowHalfX = window.innerWidth / 2;
-			var windowHalfY = window.innerHeight / 2;
-			const target = new THREE.Vector2();
-
-			var loader;
-			var modelgeom, modelgeom2, modelgeom3;
-			var objects = [];
-
-			init();
-			animate();
-			function init() {
-				container = document.getElementById("animation-content");
-				document.body.appendChild( container );
-				camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 1, 10000 );
-				camera.position.z = 1000;
-				camera.rotation.order = 'YXZ';
-				scene = new THREE.Scene();
-				
-				var numParticles = AMOUNTX * AMOUNTY;
-				var positions = new Float32Array( numParticles * 3 );
-				var scales = new Float32Array( numParticles );
-				var i = 0, j = 0;
-				for ( var ix = 0; ix < AMOUNTX; ix ++ ) {
-					for ( var iy = 0; iy < AMOUNTY; iy ++ ) {
-						positions[ i ] = ix * SEPARATION - ( ( AMOUNTX * SEPARATION ) / 2 ); // x
-						positions[ i + 1 ] = iy * SEPARATION - ( ( AMOUNTY * SEPARATION ) / 2 ); // y
-						positions[ i + 2 ] = -200; // z
-						scales[ j ] = 1;
-						i += 3;
-						j ++;
-					}
-				}
-				var geometry = new THREE.BufferGeometry();
-				geometry.addAttribute( 'position', new THREE.BufferAttribute( positions, 3 ) );
-				geometry.addAttribute( 'scale', new THREE.BufferAttribute( scales, 1 ) );
-				var material = new THREE.ShaderMaterial( {
-					uniforms: {
-						color: { value: new THREE.Color( 0xffffff ) },
-					},
-					vertexShader: document.getElementById( 'vertexshader' ).textContent,
-					fragmentShader: document.getElementById( 'fragmentshader' ).textContent
-				} );
-				//
-				particles = new THREE.Points( geometry, material );
-				scene.add( particles );
-				//
-				renderer = new THREE.WebGLRenderer( { antialias: true } );
-				renderer.setPixelRatio( window.devicePixelRatio );
-				renderer.setSize( window.innerWidth, window.innerHeight );
-				container.appendChild( renderer.domElement );
-				stats = new Stats();
-				// container.appendChild( stats.dom );
-				document.addEventListener( 'mousemove', onDocumentMouseMove, false );
-				document.addEventListener( 'touchstart', onDocumentTouchStart, false );
-				document.addEventListener( 'touchmove', onDocumentTouchMove, false );
-				//
-				window.addEventListener( 'resize', onWindowResize, false );
-
-				var light = new THREE.DirectionalLight("#fff", 1.5);
-				var light2 = new THREE.DirectionalLight("#fff", 1.5);
-				var ambient = new THREE.AmbientLight("#fff");
-				light.position.set( 0, 200, 0 );
-				light2.position.set( 0, -200, 0 );
-				scene.add(light);
-				scene.add(light2);
-				scene.add(ambient);
-
-				//hemi light
-				hemi = new THREE.HemisphereLight(0xbbbbbb, 0x660066);
-				scene.add(hemi);   
-
-				// loader = new THREE.GLTFLoader();
-				// loader.load( 'models/saturn/scene.gltf', function ( gltf ) {
-				// 	modelgeom = gltf.scene;
-				// 	modelgeom.scale.set( 20, 20, 20 );
-				// 	modelgeom.position.set(-500, 0, 0);
-				// 	scene.add(modelgeom);
-				// 	scene.traverse(function(children){
-				// 		if (children.name != "Circle") {
-				// 			objects.push(children);
-				// 		}
-				// 	});	
-
-				// 	raycaster = new THREE.Raycaster();
-				// 	mouse = new THREE.Vector2();
-					
-				// 	//add event listener for mouse and calls function when activated
-				// 	document.addEventListener( 'mousedown', onDocumentMouseDown, false );
-				// 	document.addEventListener( 'touchstart', onDocumentTouchStart, false ); 
-					
-				// 	$( ".text" ).empty();
-				// 	$( ".popup" ).hide();
-				// });
-
-				// loader.load( 'models/brain.gltf', function ( gltf ) {
-				// 	modelgeom2 = gltf.scene;
-				// 	modelgeom2.scale.set( 30, 30, 30 );
-				// 	modelgeom2.position.set(250, 200, 200);
-				// 	scene.add(modelgeom2);
-				// 	scene.traverse(function(children){
-				// 		objects.push(children);
-				// 	});	
-				// });
-
-				// loader.load( 'models/visualize3.gltf', function ( gltf ) {
-				// 	console.log(gltf);
-				// 	modelgeom3 = gltf.scene;
-				// 	modelgeom3.scale.set( 12, 12, 12 );
-				// 	modelgeom3.position.set(-250, 200, 200);
-				// 	scene.add(modelgeom3);
-				// 	scene.traverse(function(children){
-				// 		objects.push(children);
-				// 	});	
-				// });
-			}
-			function onWindowResize() {
-				windowHalfX = window.innerWidth / 2;
-				windowHalfY = window.innerHeight / 2;
-				camera.aspect = window.innerWidth / window.innerHeight;
-				camera.updateProjectionMatrix();
-				renderer.setSize( window.innerWidth, window.innerHeight );
-			}
-			//
-			function onDocumentMouseMove( event ) {
-				mouseX = event.clientX - windowHalfX;
-				mouseY = event.clientY - windowHalfY;
-			}
-			function onDocumentTouchStart( event ) {
-				if ( event.touches.length === 1 ) {
-					event.preventDefault();
-					mouseX = event.touches[ 0 ].pageX - windowHalfX;
-					mouseY = event.touches[ 0 ].pageY - windowHalfY;
-
-					onDocumentMouseDown(event);
-				}
-			}
-			function onDocumentTouchMove( event ) {
-				if ( event.touches.length === 1 ) {
-					event.preventDefault();
-					mouseX = event.touches[ 0 ].pageX - windowHalfX;
-					mouseY = event.touches[ 0 ].pageY - windowHalfY;
-				}
-			}
-			function onDocumentMouseDown( event ) {
-
-				event.preventDefault();
-
-				mouse.x = ( event.clientX / renderer.domElement.width ) * 2 - 1;
-				mouse.y = - ( event.clientY / renderer.domElement.height ) * 2 + 1;
-
-				raycaster.setFromCamera( mouse, camera );
-
-				var intersects = raycaster.intersectObjects( objects );
-
-				var color = (Math.random() * 0xffffff);
-
-				if ( intersects.length > 0 ) {
-					
-					this.temp = intersects[ 0 ].object.material.color.getHexString();
-					this.name = intersects[ 0 ].object.name;
-					console.log(intersects[0].object);
-					
-					$( ".text" ).empty();
-					$( ".popup" ).append( "<div class='text'><p>This is the color <strong>#" + this.temp + "</strong> and the name assigned in Blender is <strong>" + this.name  + "</strong></p></div>" );
-					$(".popup").show();
-					
-				}
-				else {
-					$( ".text" ).empty();
-					$( ".popup" ).hide();
-				}
-			}
-			//
-			function animate() {
-
-				requestAnimationFrame( animate );
-				render( scene, camera );
-				
-				stats.update();
-			}
-			function render() {
-				target.x = ( 1 - mouseX ) * 0.001;
-				target.y = ( 1 - mouseY ) * 0.001;
-				
-				camera.rotation.x += 0.025 * ( target.y - camera.rotation.x );
-				camera.rotation.y += 0.025 * ( target.x - camera.rotation.y );
-				// modelgeom.rotation.x += 0.05 * ( target.y - camera.rotation.x ) + 0.0035;
-				// modelgeom.rotation.y += 0.05 * ( target.x - camera.rotation.y ) - 0.0035;
-				// modelgeom2.rotation.x += 0.05 * ( target.y - camera.rotation.x ) + 0.0035;
-				// modelgeom2.rotation.y += 0.05 * ( target.x - camera.rotation.y ) - 0.0035;
-				// modelgeom3.rotation.x += 0.05 * ( target.y - camera.rotation.x ) + 0.0035;
-				// modelgeom3.rotation.y += 0.05 * ( target.x - camera.rotation.y ) - 0.0035;
-
-				var positions = particles.geometry.attributes.position.array;
-				var scales = particles.geometry.attributes.scale.array;
-				var i = 0, j = 0;
-				for ( var ix = 0; ix < AMOUNTX; ix ++ ) {
-					for ( var iy = 0; iy < AMOUNTY; iy ++ ) {
-						positions[ i + 2 ] = -200 + ( Math.sin( ( ix + count ) * 0.3 ) * 50 ) +
-										( Math.sin( ( iy + count ) * 0.5 ) * 50 );
-						scales[ j ] = ( Math.sin( ( ix + count ) * 0.3 ) + 1 ) * 8 +
-										( Math.sin( ( iy + count ) * 0.5 ) + 1 ) * 8;
-						i += 3;
-						j ++;
-					}
-				}
-				particles.geometry.attributes.position.needsUpdate = true;
-				particles.geometry.attributes.scale.needsUpdate = true;
-				renderer.render( scene, camera );
-				count += 0.025;
-			}
-
-			// from THREE.js examples
-			function generateSprite() {
-				var canvas = document.createElement('canvas');
-				canvas.width = 16;
-				canvas.height = 16;
-				var context = canvas.getContext('2d');
-				var gradient = context.createRadialGradient(canvas.width / 2, canvas.height / 2, 0, canvas.width / 2, canvas.height / 2, canvas.width / 2);
-				gradient.addColorStop(0, 'rgba(255,255,255,1)');
-				gradient.addColorStop(0.2, 'rgba(0,255,255,1)');
-				gradient.addColorStop(0.4, 'rgba(0,0,64,1)');
-				gradient.addColorStop(1, 'rgba(0,0,0,1)');
-				context.fillStyle = gradient;
-				context.fillRect(0, 0, canvas.width, canvas.height);
-				var texture = new THREE.Texture(canvas);
-				texture.needsUpdate = true;
-				return texture;
-			}
-			function createPointCloud(geom) {
-				var material = new THREE.PointsMaterial({
-					color: 0xffffff,
-					size: 3,
-					transparent: false,
-					blending: THREE.AdditiveBlending,
-					map: generateSprite()
-				});
-				var cloud = new THREE.Points(geom, material);
-				cloud.sortParticles = true;
-				return cloud;
-			}
+			var indexView = new IndexView();
+			indexView.init();
 		</script>
-
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/2.1.2/TweenMax.min.js"></script>
 		<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
 		<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
 		<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
