@@ -24,7 +24,7 @@
 			</div> -->
 			<div class="vignette"></div>
 			<div class="glitch"></div>
-			<div class="popup"><div class="text"></div></div>
+			<!-- <div class="popup"><div class="text"></div></div> -->
 			<div id="animation-content"></div>
 		</div>
 
@@ -65,7 +65,7 @@
 			const target = new THREE.Vector2();
 
 			var loader;
-			var modelgeom;
+			var modelgeom, modelgeom2, modelgeom3;
 			var objects = [];
 
 			init();
@@ -86,7 +86,7 @@
 					for ( var iy = 0; iy < AMOUNTY; iy ++ ) {
 						positions[ i ] = ix * SEPARATION - ( ( AMOUNTX * SEPARATION ) / 2 ); // x
 						positions[ i + 1 ] = iy * SEPARATION - ( ( AMOUNTY * SEPARATION ) / 2 ); // y
-						positions[ i + 2 ] = 0; // z
+						positions[ i + 2 ] = -200; // z
 						scales[ j ] = 1;
 						i += 3;
 						j ++;
@@ -118,35 +118,62 @@
 				//
 				window.addEventListener( 'resize', onWindowResize, false );
 
-				var light = new THREE.DirectionalLight("#c1582d", 1);
-				var ambient = new THREE.AmbientLight("#85b2cd");
-				light.position.set( 0, -600, 0 ).normalize();
+				var light = new THREE.DirectionalLight("#fff", 1.5);
+				var light2 = new THREE.DirectionalLight("#fff", 1.5);
+				var ambient = new THREE.AmbientLight("#fff");
+				light.position.set( 0, 200, 0 );
+				light2.position.set( 0, -200, 0 );
 				scene.add(light);
+				scene.add(light2);
 				scene.add(ambient);
 
 				//hemi light
 				hemi = new THREE.HemisphereLight(0xbbbbbb, 0x660066);
 				scene.add(hemi);   
 
-				loader = new THREE.GLTFLoader();
-				loader.load( 'models/telescope.gltf', function ( gltf ) {
-					modelgeom = gltf.scene;
-					modelgeom.scale.set( 15, 15, 15 );
-					scene.add(modelgeom);
-					scene.traverse(function(children){
-						objects.push(children);
-					});	
+				// loader = new THREE.GLTFLoader();
+				// loader.load( 'models/saturn/scene.gltf', function ( gltf ) {
+				// 	modelgeom = gltf.scene;
+				// 	modelgeom.scale.set( 20, 20, 20 );
+				// 	modelgeom.position.set(-500, 0, 0);
+				// 	scene.add(modelgeom);
+				// 	scene.traverse(function(children){
+				// 		if (children.name != "Circle") {
+				// 			objects.push(children);
+				// 		}
+				// 	});	
 
-					raycaster = new THREE.Raycaster();
-					mouse = new THREE.Vector2();
+				// 	raycaster = new THREE.Raycaster();
+				// 	mouse = new THREE.Vector2();
 					
-					//add event listener for mouse and calls function when activated
-					document.addEventListener( 'mousedown', onDocumentMouseDown, false );
-					document.addEventListener( 'touchstart', onDocumentTouchStart, false ); 
+				// 	//add event listener for mouse and calls function when activated
+				// 	document.addEventListener( 'mousedown', onDocumentMouseDown, false );
+				// 	document.addEventListener( 'touchstart', onDocumentTouchStart, false ); 
 					
-					$( ".text" ).empty();
-					$( ".popup" ).hide();
-				});
+				// 	$( ".text" ).empty();
+				// 	$( ".popup" ).hide();
+				// });
+
+				// loader.load( 'models/brain.gltf', function ( gltf ) {
+				// 	modelgeom2 = gltf.scene;
+				// 	modelgeom2.scale.set( 30, 30, 30 );
+				// 	modelgeom2.position.set(250, 200, 200);
+				// 	scene.add(modelgeom2);
+				// 	scene.traverse(function(children){
+				// 		objects.push(children);
+				// 	});	
+				// });
+
+				// loader.load( 'models/visualize3.gltf', function ( gltf ) {
+				// 	console.log(gltf);
+				// 	modelgeom3 = gltf.scene;
+				// 	modelgeom3.scale.set( 12, 12, 12 );
+				// 	modelgeom3.position.set(-250, 200, 200);
+				// 	scene.add(modelgeom3);
+				// 	scene.traverse(function(children){
+				// 		objects.push(children);
+				// 	});	
+				// });
 			}
 			function onWindowResize() {
 				windowHalfX = window.innerWidth / 2;
@@ -190,11 +217,10 @@
 				var color = (Math.random() * 0xffffff);
 
 				if ( intersects.length > 0 ) {
-
-					// intersects[ 0 ].object.material.color.setHex( color );
 					
 					this.temp = intersects[ 0 ].object.material.color.getHexString();
 					this.name = intersects[ 0 ].object.name;
+					console.log(intersects[0].object);
 					
 					$( ".text" ).empty();
 					$( ".popup" ).append( "<div class='text'><p>This is the color <strong>#" + this.temp + "</strong> and the name assigned in Blender is <strong>" + this.name  + "</strong></p></div>" );
@@ -220,15 +246,19 @@
 				
 				camera.rotation.x += 0.025 * ( target.y - camera.rotation.x );
 				camera.rotation.y += 0.025 * ( target.x - camera.rotation.y );
-				modelgeom.rotation.x += 0.05 * ( target.y - camera.rotation.x );
-				modelgeom.rotation.y += 0.05 * ( target.x - camera.rotation.y );
+				// modelgeom.rotation.x += 0.05 * ( target.y - camera.rotation.x ) + 0.0035;
+				// modelgeom.rotation.y += 0.05 * ( target.x - camera.rotation.y ) - 0.0035;
+				// modelgeom2.rotation.x += 0.05 * ( target.y - camera.rotation.x ) + 0.0035;
+				// modelgeom2.rotation.y += 0.05 * ( target.x - camera.rotation.y ) - 0.0035;
+				// modelgeom3.rotation.x += 0.05 * ( target.y - camera.rotation.x ) + 0.0035;
+				// modelgeom3.rotation.y += 0.05 * ( target.x - camera.rotation.y ) - 0.0035;
 
 				var positions = particles.geometry.attributes.position.array;
 				var scales = particles.geometry.attributes.scale.array;
 				var i = 0, j = 0;
 				for ( var ix = 0; ix < AMOUNTX; ix ++ ) {
 					for ( var iy = 0; iy < AMOUNTY; iy ++ ) {
-						positions[ i + 2 ] = ( Math.sin( ( ix + count ) * 0.3 ) * 50 ) +
+						positions[ i + 2 ] = -200 + ( Math.sin( ( ix + count ) * 0.3 ) * 50 ) +
 										( Math.sin( ( iy + count ) * 0.5 ) * 50 );
 						scales[ j ] = ( Math.sin( ( ix + count ) * 0.3 ) + 1 ) * 8 +
 										( Math.sin( ( iy + count ) * 0.5 ) + 1 ) * 8;

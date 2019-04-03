@@ -1,0 +1,170 @@
+{
+    "accessors": [
+        {
+            "bufferView": 3,
+            "byteOffset": 0,
+            "componentType": 5123,
+            "count": 349494,
+            "max": [
+                60817
+            ],
+            "min": [
+                0
+            ],
+            "name": "accessor_buffer_16809_telescope_on_mount_v1_0",
+            "type": "SCALAR"
+        },
+        {
+            "bufferView": 1,
+            "byteOffset": 0,
+            "componentType": 5126,
+            "count": 60818,
+            "max": [
+                1.0,
+                1.0000001192092896,
+                1.0
+            ],
+            "min": [
+                -1.0,
+                -1.0,
+                -1.0
+            ],
+            "name": "accessor_buffer_16809_telescope_on_mount_v1_NORMAL_0",
+            "type": "VEC3"
+        },
+        {
+            "bufferView": 0,
+            "byteOffset": 0,
+            "componentType": 5126,
+            "count": 60818,
+            "max": [
+                44.29349899291992,
+                129.19940185546875,
+                49.74089813232422
+            ],
+            "min": [
+                -44.29349899291992,
+                0.019899999722838402,
+                -28.833999633789062
+            ],
+            "name": "accessor_buffer_16809_telescope_on_mount_v1_POSITION_0",
+            "type": "VEC3"
+        },
+        {
+            "bufferView": 2,
+            "byteOffset": 0,
+            "componentType": 5126,
+            "count": 60818,
+            "max": [
+                29.176599502563477,
+                1.0
+            ],
+            "min": [
+                -29.176599502563477,
+                -58.43899917602539
+            ],
+            "name": "accessor_buffer_16809_telescope_on_mount_v1_TEXCOORD_0_0",
+            "type": "VEC2"
+        }
+    ],
+    "asset": {
+        "copyright": "",
+        "generator": "blendergltf v1.2.0",
+        "version": "2.0"
+    },
+    "bufferViews": [
+        {
+            "buffer": 0,
+            "byteLength": 729816,
+            "byteOffset": 0,
+            "byteStride": 12,
+            "name": "bufferView_buffer_16809_telescope_on_mount_v1_POSITION_0",
+            "target": 34962
+        },
+        {
+            "buffer": 0,
+            "byteLength": 729816,
+            "byteOffset": 729816,
+            "byteStride": 12,
+            "name": "bufferView_buffer_16809_telescope_on_mount_v1_NORMAL_0",
+            "target": 34962
+        },
+        {
+            "buffer": 0,
+            "byteLength": 486544,
+            "byteOffset": 1459632,
+            "byteStride": 8,
+            "name": "bufferView_buffer_16809_telescope_on_mount_v1_TEXCOORD_0_0",
+            "target": 34962
+        },
+        {
+            "buffer": 0,
+            "byteLength": 698992,
+            "byteOffset": 1946176,
+            "name": "bufferView_buffer_16809_telescope_on_mount_v1_0",
+            "target": 34963
+        }
+    ],
+    "buffers": [
+        {
+            "byteLength": 2645168,
+            "name": "buffer_telescope2",
+            "uri": "buffer_telescope2.bin"
+        }
+    ],
+    "meshes": [
+        {
+            "name": "16809_telescope_on_mount_v1",
+            "primitives": [
+                {
+                    "attributes": {
+                        "NORMAL": 1,
+                        "POSITION": 2,
+                        "TEXCOORD_0": 3
+                    },
+                    "indices": 0,
+                    "mode": 4
+                }
+            ]
+        }
+    ],
+    "nodes": [
+        {
+            "mesh": 0,
+            "name": "16809_telescope_on_mount_v1",
+            "rotation": [
+                -1.1920928955078125e-07,
+                0.0,
+                0.0,
+                1.0
+            ],
+            "scale": [
+                0.01775778830051422,
+                0.01775778830051422,
+                0.01775778830051422
+            ],
+            "translation": [
+                0.0,
+                -1.0672650337219238,
+                0.0
+            ]
+        }
+    ],
+    "scene": 0,
+    "scenes": [
+        {
+            "extras": {
+                "background_color": [
+                    0.05087608844041824,
+                    0.05087608844041824,
+                    0.05087608844041824
+                ],
+                "frames_per_second": 24
+            },
+            "name": "Scene",
+            "nodes": [
+                0
+            ]
+        }
+    ]
+}
