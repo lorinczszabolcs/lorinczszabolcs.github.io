@@ -436,10 +436,11 @@
 				constructor() {
 
 					this.samples = [
+						'../imgs/00.png',
 						'../imgs/01.png',
 						'../imgs/02.png',
-						'../imgs/03.png',
-						// '../imgs/04.png',
+						'../imgs/04.png',
+						// '../imgs/03.png',
 						// '../imgs/05.png',
 					];
 
@@ -447,8 +448,8 @@
 					this.initParticles();
 					// this.initControls();
 
-					const rnd = ~~(Math.random() * this.samples.length);
-					this.goto(rnd);
+					// const rnd = ~~(Math.random() * this.samples.length);
+					this.goto(0);
 				}
 
 				initThree() {
@@ -583,6 +584,7 @@
 					handleswipe = callback || function(swipedir){}
 
 					touchsurface.addEventListener('touchstart', function(e){
+						console.log(e);
 						var touchobj = e.changedTouches[0]
 						swipedir = 'none'
 						dist = 0
