@@ -128,8 +128,23 @@ a:focus {
 	}
 }
 
+#text__container{
+	width: 70vw;
+	height: 100vh;
+	text-align: center;
+	background: rgba(0, 0, 0, 0);
+	color: rgba(0, 0, 0, 0);;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	position: absolute;
+	left: 0px;
+	top: 0px;
+	z-index: -1;
+  }
+
 #swipezone{
-	width: 100%;
+	width: 100vw;
 	height: 100vh;
 	text-align: center;
 	background: rgba(0, 0, 0, 0);

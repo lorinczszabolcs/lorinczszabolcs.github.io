@@ -187,6 +187,9 @@
 		</main>
 		<div class="container2">
 		</div>
+		<div id="text__container">
+			<h1 class="text-light" id="text__h1">Placeholder</h1>
+		</div>
 		<div id="swipezone">
 		</div>
 
@@ -444,6 +447,13 @@
 						// '../imgs/05.png',
 					];
 
+					this.sample_texts = [
+						'Hi!',
+						'UBB',
+						'Astronomy',
+						'Braiiiiiinz'
+					];
+
 					this.initThree();
 					this.initParticles();
 					// this.initControls();
@@ -505,13 +515,30 @@
 				}
 
 				next() {
-					if (this.currSample < this.samples.length - 1) this.goto(this.currSample + 1);
-					else this.goto(0);
+					if (this.currSample < this.samples.length - 1)
+					{
+						this.goto(this.currSample + 1);
+						console.log(document.getElementById('text__h1'));
+						document.getElementById('text__h1').innerHTML = this.sample_texts[this.currSample + 1];
+					}
+					else {
+						this.goto(0);
+						console.log(document.getElementById('text__h1'));
+						document.getElementById('text__h1').innerHTML = this.sample_texts[0];
+					}
 				}
 
 				previous() {
-					if (this.currSample > 0) this.goto(this.currSample - 1);
-					else this.goto(this.samples.length - 1);
+					if (this.currSample > 0){
+						this.goto(this.currSample - 1);
+						console.log(document.getElementById('text__h1'));
+						document.getElementById('text__h1').innerHTML = this.sample_texts[this.currSample - 1];
+					}
+					else {
+						this.goto(this.samples.length - 1);
+						console.log(document.getElementById('text__h1'));
+						document.getElementById('text__h1').innerHTML = this.sample_texts[this.samples.length - 1];
+					}
 				}
 
 				// ---------------------------------------------------------------------------------------------
