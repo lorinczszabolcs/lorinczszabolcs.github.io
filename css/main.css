@@ -1,5 +1,5 @@
 .demo-1{
-    background-color: #222;
+  background-color: #222;
 	margin: 0;
 	overflow: hidden;
 }
@@ -140,20 +140,80 @@ a:focus {
 	position: absolute;
 	left: 0px;
 	top: 0px;
-	z-index: -1;
-  }
-
-#swipezone{
-	width: 100vw;
-	height: 100vh;
-	text-align: center;
-	background: rgba(0, 0, 0, 0);
-	color: rgba(0, 0, 0, 0);;
-	display: flex;
-	justify-content: center;
-	align-items: center;
+	z-index: 1;
+}
+	
+.text {
 	position: absolute;
-	left: 0px;
-	top: 0px;
-	z-index: -1;
+	width: 800px;
+	left: 50%;
+	margin-left: -115px;
+	height: 40px;
+	top: 50%;
+	margin-top: -20px;
+}
+
+h1 {
+	display: inline-block;
+	vertical-align: top;
+	margin: 0;
+}
+
+.word {
+	position: absolute;
+	width: 800px;
+	opacity: 0;
+}
+
+.letter {
+	display: inline-block;
+	position: relative;
+	float: left;
+	border-bottom: 2px solid tomato;
+	border-spacing:0;
+	transform: translateZ(25px);
+	transform-origin: 50% 50% 25px;
+}
+
+.letter.out {
+	transform: rotateX(90deg);
+	-webkit-transform: rotateX(90deg);
+	transition: transform 0.32s cubic-bezier(0.55, 0.055, 0.675, 0.19);
+}
+
+.letter.behind {
+	transform: rotateX(-90deg);
+	-webkit-transform: rotateX(-90deg);
+}
+
+.letter.in {
+	transform: rotateX(0deg);
+	-webkit-transform: rotateX(0deg);
+	transition: transform 0.38s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.showSpaces{
+  white-space: pre;
+}
+
+html {
+  font-size: 1rem;
+}
+
+@include media-breakpoint-up(sm) {
+  html {
+    font-size: 1.2rem;
   }
+}
+
+@include media-breakpoint-up(md) {
+  html {
+    font-size: 1.4rem;
+  }
+}
+
+@include media-breakpoint-up(lg) {
+  html {
+    font-size: 1.6rem;
+  }
+}

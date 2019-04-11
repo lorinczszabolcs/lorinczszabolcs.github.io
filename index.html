@@ -186,16 +186,23 @@
 			}
 		</script>
 
-		<main>
-		</main>
-		<div class="container2">
+		<div class="webgl__container">
 		</div>
-		<div id="text__container">
-			<h1 class="text-light" id="text__h1">Placeholder</h1>
+		<div class="text text-light" id="text__container">
+			<ul class="list-inline">
+				<li class="list-inline-item">
+						<h1> Hi! I am</h1>
+				</li>
+				<li class="list-inline-item">
+					<h1>
+						<span class="word wisteria">Szabolcs Lőrincz.</span>
+						<span class="word belize">a student.</span>
+						<span class="word pomegranate">an amateur astronomer.</span>
+						<span class="word green">a neuroscience enthusiast.</span>
+					</h1>
+				</li>
+			</ul>
 		</div>
-		<div id="swipezone">
-		</div>
-
 		<script>
 
 			function throttle(fn, wait) {
@@ -450,19 +457,21 @@
 						// '../imgs/05.png',
 					];
 
-					this.sample_texts = [
-						'Hi!',
-						'UBB',
-						'Astronomy',
-						'Braiiiiiinz'
-					];
+					// this.sample_texts = [
+					// 	'Hi!',
+					// 	'UBB',
+					// 	'Astronomy',
+					// 	'Braiiiiiinz',
+					// ];
 
 					this.initThree();
 					this.initParticles();
+					this.initWordRotator();
 					// this.initControls();
 
 					// const rnd = ~~(Math.random() * this.samples.length);
 					this.goto(0);
+					// document.getElementById('text__h1').innerHTML = this.sample_texts[0];
 				}
 
 				initThree() {
@@ -487,6 +496,10 @@
 				initParticles() {
 					this.particles = new Particles(this);
 					this.scene.add(this.particles.container);
+				}
+
+				initWordRotator() {
+					this.wordRotator = new WordRotator();
 				}
 
 				// ---------------------------------------------------------------------------------------------
@@ -518,29 +531,29 @@
 				}
 
 				next() {
+					this.wordRotator.changeWord(1);
 					if (this.currSample < this.samples.length - 1)
 					{
+						// document.getElementById('text__h1').innerHTML = this.sample_texts[this.currSample + 1];
 						this.goto(this.currSample + 1);
-						console.log(document.getElementById('text__h1'));
-						document.getElementById('text__h1').innerHTML = this.sample_texts[this.currSample + 1];
 					}
 					else {
+						// document.getElementById('text__h1').innerHTML = this.sample_texts[0];
 						this.goto(0);
-						console.log(document.getElementById('text__h1'));
-						document.getElementById('text__h1').innerHTML = this.sample_texts[0];
 					}
 				}
 
 				previous() {
+					this.wordRotator.changeWord(-1);
 					if (this.currSample > 0){
+						// document.getElementById('text__h1').innerHTML = this.sample_texts[this.currSample - 1];
 						this.goto(this.currSample - 1);
-						console.log(document.getElementById('text__h1'));
-						document.getElementById('text__h1').innerHTML = this.sample_texts[this.currSample - 1];
+						
 					}
 					else {
+						// document.getElementById('text__h1').innerHTML = this.sample_texts[this.samples.length - 1];
 						this.goto(this.samples.length - 1);
-						console.log(document.getElementById('text__h1'));
-						document.getElementById('text__h1').innerHTML = this.sample_texts[this.samples.length - 1];
+						
 					}
 				}
 
@@ -578,28 +591,15 @@
 
 				initWebGL() {
 					this.webgl = new WebGLView(this);
-					document.querySelector('.container2').appendChild(this.webgl.renderer.domElement);
+					document.querySelector('.webgl__container').appendChild(this.webgl.renderer.domElement);
 				}
 
 				// initGUI() {
 				// 	this.gui = new GUIView(this);
 				// }
 
-				addListeners() {
-					this.handlerAnimate = this.animate.bind(this);
-
-					window.addEventListener('resize', this.resize.bind(this));
-					// window.addEventListener('keyup', this.keyup.bind(this));
-					
-					const el = this.webgl.renderer.domElement;
-					el.addEventListener("mousewheel", _.debounce(this.wheel.bind(this), 200));
-					el.addEventListener("wheel", _.debounce(this.wheel.bind(this), 200));
-					el.addEventListener("DOMMouseScroll", _.debounce(this.wheel.bind(this), 200));
-					el.addEventListener("MozMousePixelScroll", _.debounce(this.wheel.bind(this), 200));
-
-					// credit: http://www.javascriptkit.com/javatutors/touchevents2.shtml
-					function swipedetect(el, callback){
-					
+				swipedetect(el, callback){
+  
 					var touchsurface = el,
 					swipedir,
 					startX,
@@ -614,7 +614,6 @@
 					handleswipe = callback || function(swipedir){}
 
 					touchsurface.addEventListener('touchstart', function(e){
-						console.log(e);
 						var touchobj = e.changedTouches[0]
 						swipedir = 'none'
 						dist = 0
@@ -634,27 +633,32 @@
 						distY = touchobj.pageY - startY // get vertical dist traveled by finger while in contact with surface
 						elapsedTime = new Date().getTime() - startTime // get time elapsed
 						if (elapsedTime <= allowedTime){ // first condition for awipe met
-							if (Math.abs(distX) >= threshold && Math.abs(distY) <= restraint){ // 2nd condition for horizontal swipe met
-								swipedir = (distX < 0)? 0 : 0 // if dist traveled is negative, it indicates left swipe
-							}
-							else if (Math.abs(distY) >= threshold && Math.abs(distX) <= restraint){ // 2nd condition for vertical swipe met
-								swipedir = (distY < 0)? 1 : -1 // if dist traveled is negative, it indicates up swipe
+							if (Math.abs(distY) >= threshold && Math.abs(distX) <= restraint){ // 2nd condition for vertical swipe met
+								swipedir = (distY < 0)? 'up' : 'down' // if dist traveled is negative, it indicates up swipe
 							}
 						}
 						handleswipe(swipedir)
 						e.preventDefault()
 					}, false)
-					}
+				}
 
-					//USAGE:
+				addListeners() {
+					this.handlerAnimate = this.animate.bind(this);
 
-					const el2 = document.getElementById('swipezone');
-					swipedetect(el2, function(swipedir){
-						if (swipedir > 0) {
-							this.webgl.previous();
+					window.addEventListener('resize', this.resize.bind(this));
+					// window.addEventListener('keyup', this.keyup.bind(this));
+					
+					const el = this.webgl.renderer.domElement;
+					document.addEventListener("mousewheel", _.debounce(this.wheel.bind(this), 400, { trailing: false, leading: true }));
+					document.addEventListener("wheel", _.debounce(this.wheel.bind(this), 400, { trailing: false, leading: true }));
+					document.addEventListener("DOMMouseScroll", _.debounce(this.wheel.bind(this), 400, { trailing: false, leading: true }));
+					document.addEventListener("MozMousePixelScroll", _.debounce(this.wheel.bind(this), 400, { trailing: false, leading: true }));
+					this.swipedetect(document, function(swipedir){
+						if (swipedir == 'up') {
+							this.webgl.next();
 						}
 						else {
-							this.webgl.next();
+							this.webgl.previous();
 						}
 					});
 				}
@@ -689,33 +693,90 @@
 					if (this.webgl) this.webgl.resize();
 				}
 
-				// keyup(e) {
-				// 	// g
-				// 	if (e.keyCode == 71) { if (this.gui) this.gui.toggle(); }
-				// }
-
 				wheel(e) {
-					console.log(e);
-					// const check = this.lethargy.check(e);
-
-					// if (check !== false) {
-					// 	if (check === -1) {
-					// 		if (e.deltaY > 0) {
-					// 			console.log(e.deltaY);
-					// 			this.webgl.previous();
-					// 		}
-					// 	}
-					// 	else {
-					// 			this.webgl.next();
-					// 	}
-					// }
-
 					if (e.deltaY > 0) {
 						this.webgl.next();
 					}
 					else {
 						this.webgl.previous();
 					}
+				}
+			}
+
+			class WordRotator{
+				constructor() {
+					this.words = document.getElementsByClassName('word');
+					this.wordArray = [];
+					this.currentWord = 0;
+
+					this.words[this.currentWord].style.opacity = 1;
+					for (var i = 0; i < this.words.length; i++) {
+						this.splitLetters(this.words[i]);
+					}
+				}
+				
+
+				changeWord(pos) {
+					var cw = this.wordArray[this.currentWord];
+					var nw = this.currentWord == this.words.length - pos ? this.wordArray[0] : this.wordArray[this.currentWord + pos];
+					if (this.currentWord == 0 && pos == -1) {
+						nw = this.wordArray[this.words.length-1];
+					}
+					for (var i = 0; i < cw.length; i++) {
+						this.animateLetterOut(cw, i);
+					}
+				
+					for (var i = 0; i < nw.length; i++) {
+						nw[i].className = nw[i].innerHTML == ' ' ? 'letter behind showSpaces' : 'letter behind';
+						nw[0].parentElement.style.opacity = 1;
+						this.animateLetterIn(nw, i);
+					}
+
+					if (pos == 1){
+						if (this.currentWord < this.wordArray.length - 1) {
+							this.currentWord += pos;
+						}
+						else {
+							this.currentWord = 0;
+						}
+					}	
+					else {
+						if (this.currentWord > 0) {
+							this.currentWord += pos;
+						}
+						else {
+							this.currentWord = this.wordArray.length - 1;
+						}
+					}
+					// this.currentWord = (this.currentWord == this.wordArray.length - pos) ? 0 : this.currentWord + pos;
+				
+				}
+
+				animateLetterOut(cw, i) {
+					setTimeout(function() {
+						cw[i].className = cw[i].innerHTML == ' ' ? 'letter out showSpaces' : 'letter out';
+					}, i * 80);
+				}
+
+				animateLetterIn(nw, i) {
+					setTimeout(function() {
+						nw[i].className = nw[i].innerHTML == ' ' ? 'letter in showSpaces' : 'letter in';
+					}, 340 + (i * 80));
+				}
+
+				splitLetters(word) {
+					var content = word.innerHTML;
+					word.innerHTML = '';
+					var letters = [];
+					for (var i = 0; i < content.length; i++) {
+						var letter = document.createElement('span');
+						letter.className = content.charAt(i) == ' ' ? 'letter showSpaces' : 'letter';
+						letter.innerHTML = content.charAt(i);
+						word.appendChild(letter);
+						letters.push(letter);
+					}
+					
+					this.wordArray.push(letters);
 				}
 			}
 		</script>
