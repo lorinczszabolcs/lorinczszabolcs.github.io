@@ -6,12 +6,12 @@ then
     exit 1
 fi
 
-let branchName = `git branch | grep \* | cut -d ' ' -f2`
+branchName=`git branch | grep \* | cut -d ' ' -f2`
 
 echo "$branchName"
 
 git add .
-git commit -m $1
+git commit -m "$1"
 git push
 git checkout dev
 git merge 1-landing-page
