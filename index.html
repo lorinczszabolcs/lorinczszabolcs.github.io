@@ -572,10 +572,10 @@
 				resize() {
 					if (!this.renderer) return;
 
-					// var realToCSSPixels = window.devicePixelRatio;
+					var realToCSSPixels = window.devicePixelRatio;
 
-					var width = Math.floor(document.getElementsByClassName('webgl__container')[0].offsetWidth);
-					var height = Math.floor(document.documentElement.clientHeight);
+					var width = Math.floor(document.getElementsByClassName('webgl__container')[0].offsetWidth * realToCSSPixels);
+					var height = Math.floor(document.documentElement.clientHeight * realToCSSPixels);
 					this.camera.aspect = width / height;
 					this.camera.updateProjectionMatrix();
 
