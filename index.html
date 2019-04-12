@@ -188,7 +188,7 @@
 
 		<div class="container home__container" style="background-color: #222;">
 			<div class="row">
-				<div class="text text-light col-sm-6" id="text__container">
+				<div class="text text-light col-lg-6" id="text__container">
 					<ul class="list-inline">
 						<li class="list-inline-item">
 								<h1> Hi! I am</h1>
@@ -203,7 +203,7 @@
 						</li>
 					</ul>
 				</div>
-				<div class="webgl__container col-sm-6">
+				<div class="webgl__container col-lg-6">
 				</div>
 			</div>
 		</div>
@@ -571,8 +571,11 @@
 
 				resize() {
 					if (!this.renderer) return;
-					var width = document.getElementsByClassName('webgl__container')[0].offsetWidth;
-					var height = window.innerHeight;
+
+					// var realToCSSPixels = window.devicePixelRatio;
+
+					var width = Math.floor(document.getElementsByClassName('webgl__container')[0].offsetWidth);
+					var height = Math.floor(document.documentElement.clientHeight);
 					this.camera.aspect = width / height;
 					this.camera.updateProjectionMatrix();
 
