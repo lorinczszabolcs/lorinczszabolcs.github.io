@@ -13,14 +13,13 @@
 		<!-- <link rel="shortcut icon" href="favicon.ico"> -->
 		<link rel="stylesheet" href="css/main.css">
 		<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
-		<script>document.documentElement.className="js";var supportsCssVars=function(){var e,t=document.createElement("style");return t.innerHTML="root: { --tmp-var: bold; }",document.head.appendChild(t),e=!!(window.CSS&&window.CSS.supports&&window.CSS.supports("font-weight","var(--tmp-var)")),t.parentNode.removeChild(t),e};supportsCssVars()||alert("Please view this demo in a modern browser that supports CSS Variables.");</script>
+		<script>document.documentElement.className="js";var supportsCssVars=function(){var e,t=document.createElement("style");return t.innerHTML="root: { --tmp-var: bold; }",document.head.appendChild(t),e=!!(window.CSS&&window.CSS.supports&&window.CSS.supports("font-weight","var(--tmp-var)")),t.parentNode.removeChild(t),e};supportsCssVars()||alert("Please view this website in a modern browser that supports CSS Variables.");</script>
 		<script src="js/three.js"></script>
-		<!-- <script src="js/libs/lethargy.min.js"></script> -->
 		<script src="js/libs/lodash.js"></script>
-
-	
+		<script src="js/libs/hammer.min.js"></script>
 	</head>
-	<body class="demo-1">
+	<body class="body__home" style="background-color: #222;">
+		<!--Vertex shader-->
 		<script type="x-shader/x-vertex" id="vertexshader">
 			// @author brunoimbrizi / http://brunoimbrizi.com
 
@@ -150,6 +149,7 @@
 				gl_Position = finalPosition;
 			}
 		</script>
+		<!--Fragment shader-->
 		<script type="x-shader/x-vertex" id="fragmentshader">	
 			// @author brunoimbrizi / http://brunoimbrizi.com
 
@@ -186,23 +186,31 @@
 			}
 		</script>
 
-		<div class="webgl__container">
+		<div class="container home__container" style="background-color: #222;">
+			<div class="row">
+				<div class="text text-light col-sm-6" id="text__container">
+					<ul class="list-inline">
+						<li class="list-inline-item">
+								<h1> Hi! I am</h1>
+						</li>
+						<li class="list-inline-item">
+							<h1>
+								<span class="word wisteria">Szabolcs Lőrincz.</span>
+								<span class="word belize">a student.</span>
+								<span class="word pomegranate">an amateur astronomer.</span>
+								<span class="word green">a neuroscience enthusiast.</span>
+							</h1>
+						</li>
+					</ul>
+				</div>
+				<div class="webgl__container col-sm-6">
+				</div>
+			</div>
 		</div>
-		<div class="text text-light" id="text__container">
-			<ul class="list-inline">
-				<li class="list-inline-item">
-						<h1> Hi! I am</h1>
-				</li>
-				<li class="list-inline-item">
-					<h1>
-						<span class="word wisteria">Szabolcs Lőrincz.</span>
-						<span class="word belize">a student.</span>
-						<span class="word pomegranate">an amateur astronomer.</span>
-						<span class="word green">a neuroscience enthusiast.</span>
-					</h1>
-				</li>
-			</ul>
+
+		<div id="swipezone">
 		</div>
+		
 		<script>
 
 			function throttle(fn, wait) {
@@ -449,10 +457,10 @@
 				constructor() {
 
 					this.samples = [
-						'../imgs/00.png',
-						'../imgs/01.png',
-						'../imgs/02.png',
-						'../imgs/03.png',
+						'../imgs/00_1.png',
+						'../imgs/01_1.png',
+						'../imgs/02_1.png',
+						'../imgs/03_1.png',
 						// '../imgs/03.png',
 						// '../imgs/05.png',
 					];
@@ -563,12 +571,13 @@
 
 				resize() {
 					if (!this.renderer) return;
-					this.camera.aspect = window.innerWidth / window.innerHeight;
+					var width = document.getElementsByClassName('webgl__container')[0].offsetWidth;
+					var height = window.innerHeight;
+					this.camera.aspect = width / height;
 					this.camera.updateProjectionMatrix();
 
 					this.fovHeight = 2 * Math.tan((this.camera.fov * Math.PI) / 180 / 2) * this.camera.position.z;
-
-					this.renderer.setSize(window.innerWidth, window.innerHeight);
+					this.renderer.setSize(width, height);
 
 					// if (this.interactive) this.interactive.resize();
 					if (this.particles) this.particles.resize();
@@ -583,7 +592,7 @@
 
 				init() {
 					this.initWebGL();
-					// this.initGUI();
+					this.initHammer();
 					this.addListeners();
 					this.animate();
 					this.resize();
@@ -594,52 +603,12 @@
 					document.querySelector('.webgl__container').appendChild(this.webgl.renderer.domElement);
 				}
 
-				// initGUI() {
-				// 	this.gui = new GUIView(this);
-				// }
-
-				swipedetect(el, callback){
-  
-					var touchsurface = el,
-					swipedir,
-					startX,
-					startY,
-					distX,
-					distY,
-					threshold = 150, //required min distance traveled to be considered swipe
-					restraint = 100, // maximum distance allowed at the same time in perpendicular direction
-					allowedTime = 300, // maximum time allowed to travel that distance
-					elapsedTime,
-					startTime,
-					handleswipe = callback || function(swipedir){}
-
-					touchsurface.addEventListener('touchstart', function(e){
-						var touchobj = e.changedTouches[0]
-						swipedir = 'none'
-						dist = 0
-						startX = touchobj.pageX
-						startY = touchobj.pageY
-						startTime = new Date().getTime() // record time when finger first makes contact with surface
-						e.preventDefault()
-					}, false)
-
-					touchsurface.addEventListener('touchmove', function(e){
-						e.preventDefault() // prevent scrolling when inside DIV
-					}, false)
-
-					touchsurface.addEventListener('touchend', function(e){
-						var touchobj = e.changedTouches[0]
-						distX = touchobj.pageX - startX // get horizontal dist traveled by finger while in contact with surface
-						distY = touchobj.pageY - startY // get vertical dist traveled by finger while in contact with surface
-						elapsedTime = new Date().getTime() - startTime // get time elapsed
-						if (elapsedTime <= allowedTime){ // first condition for awipe met
-							if (Math.abs(distY) >= threshold && Math.abs(distX) <= restraint){ // 2nd condition for vertical swipe met
-								swipedir = (distY < 0)? 'up' : 'down' // if dist traveled is negative, it indicates up swipe
-							}
-						}
-						handleswipe(swipedir)
-						e.preventDefault()
-					}, false)
+				initHammer() {
+					this.hammertime = new Hammer(document.getElementById("swipezone"));
+					console.log(this.hammertime);
+					this.hammertime.on('swipe', function(ev) {
+						console.log(ev);
+					});
 				}
 
 				addListeners() {
@@ -653,14 +622,6 @@
 					document.addEventListener("wheel", _.debounce(this.wheel.bind(this), 400, { trailing: false, leading: true }));
 					document.addEventListener("DOMMouseScroll", _.debounce(this.wheel.bind(this), 400, { trailing: false, leading: true }));
 					document.addEventListener("MozMousePixelScroll", _.debounce(this.wheel.bind(this), 400, { trailing: false, leading: true }));
-					this.swipedetect(document, function(swipedir){
-						if (swipedir == 'up') {
-							this.webgl.next();
-						}
-						else {
-							this.webgl.previous();
-						}
-					});
 				}
 
 				animate() {
