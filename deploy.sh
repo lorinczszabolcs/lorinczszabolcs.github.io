@@ -6,9 +6,9 @@ then
     exit 1
 fi
 
-branchName = `git branch | grep \* | cut -d ' ' -f2`
+let branchName = `git branch | grep \* | cut -d ' ' -f2`
 
-echo "$(branchName)"
+echo "$branchName"
 
 git add .
 git commit -m $1
