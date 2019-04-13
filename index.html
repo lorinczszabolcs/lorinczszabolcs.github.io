@@ -2,7 +2,7 @@
 <html lang="en" class="no-js">
 	<head>
 		<meta charset="UTF-8" />
-		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 		<title>Lőrincz Szabolcs-Botond | Personal Website</title>
 		<meta name="description" content="Personal website of Lőrincz Szabolcs-Botond." />
 		<meta name="keywords" content="portfolio, personal" />
@@ -188,7 +188,7 @@
 
 		<div class="container home__container" style="background-color: #222;">
 			<div class="row">
-				<div class="text text-light col-lg-6" id="text__container">
+				<div class="text text-light flex-row col-lg-6" id="text__container">
 					<ul class="list-inline">
 						<li class="list-inline-item">
 								<h1> Hi! I am</h1>
@@ -574,8 +574,8 @@
 
 					var realToCSSPixels = window.devicePixelRatio;
 
-					var width = Math.floor(document.getElementsByClassName('webgl__container')[0].offsetWidth * realToCSSPixels);
-					var height = Math.floor(document.documentElement.clientHeight * realToCSSPixels);
+					var width = Math.floor(document.getElementsByClassName('webgl__container')[0].offsetWidth);
+					var height = Math.floor(document.documentElement.clientHeight);
 					this.camera.aspect = width / height;
 					this.camera.updateProjectionMatrix();
 
@@ -590,7 +590,7 @@
 			class IndexView {
 
 				constructor() {
-					// this.lethargy = new Lethargy();
+
 				}
 
 				init() {
@@ -607,10 +607,17 @@
 				}
 
 				initHammer() {
-					this.hammertime = new Hammer(document.getElementById("swipezone"));
-					console.log(this.hammertime);
-					this.hammertime.on('swipe', function(ev) {
-						console.log(ev);
+					this.swipeManager = new Hammer.Manager(document.querySelector('#swipezone'));
+					this.swipeManager.add(new Hammer.Swipe({ threshold: 10, pointers: 1 }));
+					var that = this;
+					this.swipeManager.on('swipeup', function(e) {
+						that.webgl.next();
+						console.log(e);
+					});
+
+					this.swipeManager.on('swipedown', function(e) {
+						that.webgl.previous();
+						console.log(e);
 					});
 				}
 
