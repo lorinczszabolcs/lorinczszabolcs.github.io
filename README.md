@@ -1,2 +1,2 @@
 # Personal website
-Hi, I am Lőrincz Szabolcs-Botond, and this is my personal website.
+Hi, I am Szabolcs-Botond Lőrincz, and this is my personal website.
